@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#132927">
+    <meta name="description" content="SentinelOps system monitoring dashboard application">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="SentinelOps">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>SentinelOps</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="assets/icon.svg">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Primary">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div>
+            <strong>SentinelOps</strong>
+            <small>System Monitor</small>
+          </div>
+        </div>
+
+        <nav class="nav-list" aria-label="Dashboard views">
+          <button class="nav-item is-active" type="button" data-view="overview">
+            <span class="icon icon-overview" aria-hidden="true"></span>
+            Overview
+          </button>
+          <button class="nav-item" type="button" data-view="hosts">
+            <span class="icon icon-hosts" aria-hidden="true"></span>
+            Hosts
+          </button>
+          <button class="nav-item" type="button" data-view="network">
+            <span class="icon icon-network" aria-hidden="true"></span>
+            Network
+          </button>
+          <button class="nav-item" type="button" data-view="incidents">
+            <span class="icon icon-incidents" aria-hidden="true"></span>
+            Incidents
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="health-dial" aria-label="Fleet health score">
+            <svg viewBox="0 0 120 120" role="img" aria-labelledby="health-title health-value">
+              <title id="health-title">Fleet health</title>
+              <desc id="health-value">Fleet health score is 94 percent</desc>
+              <circle class="dial-track" cx="60" cy="60" r="46"></circle>
+              <circle id="healthDial" class="dial-value" cx="60" cy="60" r="46"></circle>
+            </svg>
+            <div>
+              <strong id="healthScore">94%</strong>
+              <span>Fleet health</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Production cluster</p>
+            <h1>SentinelOps</h1>
+          </div>
+
+          <div class="topbar-actions" aria-label="Dashboard controls">
+            <label class="search">
+              <span class="icon icon-search" aria-hidden="true"></span>
+              <input id="searchInput" type="search" placeholder="Search hosts, alerts, processes" autocomplete="off">
+            </label>
+            <select id="environmentSelect" aria-label="Environment">
+              <option value="production">Production</option>
+              <option value="staging">Staging</option>
+              <option value="edge">Edge</option>
+            </select>
+            <div class="segmented" role="group" aria-label="Time range">
+              <button class="is-active" type="button" data-window="1h">1h</button>
+              <button type="button" data-window="6h">6h</button>
+              <button type="button" data-window="24h">24h</button>
+            </div>
+            <button id="refreshButton" class="icon-button" type="button" aria-label="Refresh metrics" title="Refresh metrics">
+              <span class="icon icon-refresh" aria-hidden="true"></span>
+            </button>
+            <button id="installButton" class="app-button" type="button" hidden>
+              <span class="icon icon-install" aria-hidden="true"></span>
+              Install
+            </button>
+          </div>
+        </header>
+
+        <section class="status-strip" aria-label="Current status">
+          <div class="status-pill ok">
+            <span></span>
+            All core services online
+          </div>
+          <div class="status-pill warn">
+            <span></span>
+            2 warnings
+          </div>
+          <div class="status-pill">
+            Last update <strong id="lastUpdated">--:--:--</strong>
+          </div>
+          <div class="status-pill" id="appStatus">
+            <span></span>
+            App ready
+          </div>
+          <label class="live-toggle">
+            <input id="liveToggle" type="checkbox" checked>
+            <span aria-hidden="true"></span>
+            Live
+          </label>
+        </section>
+
+        <section class="metrics-grid" aria-label="Key metrics">
+          <article class="metric-card" data-metric-card="cpu">
+            <div>
+              <span class="metric-label">CPU load</span>
+              <strong id="cpuValue">42%</strong>
+            </div>
+            <canvas id="cpuSparkline" width="180" height="48" aria-label="CPU trend"></canvas>
+            <span class="metric-delta" id="cpuDelta">+3.4%</span>
+          </article>
+          <article class="metric-card" data-metric-card="memory">
+            <div>
+              <span class="metric-label">Memory</span>
+              <strong id="memoryValue">68%</strong>
+            </div>
+            <canvas id="memorySparkline" width="180" height="48" aria-label="Memory trend"></canvas>
+            <span class="metric-delta" id="memoryDelta">+1.1%</span>
+          </article>
+          <article class="metric-card" data-metric-card="disk">
+            <div>
+              <span class="metric-label">Disk usage</span>
+              <strong id="diskValue">57%</strong>
+            </div>
+            <canvas id="diskSparkline" width="180" height="48" aria-label="Disk usage trend"></canvas>
+            <span class="metric-delta stable" id="diskDelta">-0.8%</span>
+          </article>
+          <article class="metric-card" data-metric-card="network">
+            <div>
+              <span class="metric-label">Network I/O</span>
+              <strong id="networkValue">2.4 GB/s</strong>
+            </div>
+            <canvas id="networkSparkline" width="180" height="48" aria-label="Network trend"></canvas>
+            <span class="metric-delta" id="networkDelta">+8.6%</span>
+          </article>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="panel panel-main" aria-labelledby="telemetryTitle">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Telemetry</p>
+                <h2 id="telemetryTitle">Resource utilization</h2>
+              </div>
+              <div class="legend" aria-label="Chart legend">
+                <button class="legend-item is-active" type="button" data-series="cpu"><span class="swatch cpu"></span>CPU</button>
+                <button class="legend-item is-active" type="button" data-series="memory"><span class="swatch memory"></span>Memory</button>
+                <button class="legend-item is-active" type="button" data-series="disk"><span class="swatch disk"></span>Disk</button>
+              </div>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="mainChart" width="900" height="360" aria-label="CPU, memory, and disk utilization chart"></canvas>
+              <output id="chartTooltip" class="chart-tooltip" hidden></output>
+            </div>
+          </article>
+
+          <article class="panel" aria-labelledby="hostsTitle">
+            <div class="panel-header compact">
+              <div>
+                <p class="eyebrow">Hosts</p>
+                <h2 id="hostsTitle">Node health</h2>
+              </div>
+              <span class="count-badge" id="hostCount">12</span>
+            </div>
+            <div id="hostMap" class="host-map" aria-label="Host health map"></div>
+          </article>
+
+          <article class="panel" aria-labelledby="alertsTitle">
+            <div class="panel-header compact">
+              <div>
+                <p class="eyebrow">Signals</p>
+                <h2 id="alertsTitle">Active alerts</h2>
+              </div>
+              <button id="clearAlertsButton" class="icon-button" type="button" aria-label="Acknowledge warnings" title="Acknowledge warnings">
+                <span class="icon icon-check" aria-hidden="true"></span>
+              </button>
+            </div>
+            <div id="alertsList" class="alerts-list"></div>
+          </article>
+        </section>
+
+        <section class="lower-grid">
+          <article class="panel" aria-labelledby="processTitle">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Runtime</p>
+                <h2 id="processTitle">Top processes</h2>
+              </div>
+              <div class="table-actions">
+                <button class="icon-button" id="sortCpuButton" type="button" aria-label="Sort by CPU" title="Sort by CPU">
+                  <span class="icon icon-sort" aria-hidden="true"></span>
+                </button>
+                <button class="icon-button" id="pauseButton" type="button" aria-label="Pause live table" title="Pause live table">
+                  <span class="icon icon-pause" aria-hidden="true"></span>
+                </button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Process</th>
+                    <th scope="col">Host</th>
+                    <th scope="col">CPU</th>
+                    <th scope="col">Memory</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="processTable"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="panel" aria-labelledby="logTitle">
+            <div class="panel-header compact">
+              <div>
+                <p class="eyebrow">Events</p>
+                <h2 id="logTitle">Activity stream</h2>
+              </div>
+              <span class="count-badge" id="eventCount">0</span>
+            </div>
+            <ol id="activityLog" class="activity-log"></ol>
+          </article>
+        </section>
+      </main>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
